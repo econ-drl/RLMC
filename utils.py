@@ -140,15 +140,15 @@ def plot_best_data(train_error, valid_error, test_error):
 ############
 def evaluate_agent(agent, test_states, test_bm_preds, test_y):
     with torch.no_grad():
-        weights = agent.select_action(test_states)  # (2816, 9)
+        weights = agent.select_action(test_states)  # (2816, 9)  # SRAY  (500, 9)  not (2816,9)
     act_counter = Counter(weights.argmax(1))
     act_sorted  = sorted([(k, v) for k, v in act_counter.items()])
-    weights = np.expand_dims(weights, -1)  # (2816, 9, 1)
-    print (weights.shape); #sray
-    print (test_bm_preds.shape); #sray
+    print (weights.shape); #sray (500,9)
+    weights = np.expand_dims(weights, -1)  # (2816, 9, 1)   Sray it is (500,9,1)
+    print (weights.shape); #sray  (500,9,1)
+    print (test_bm_preds); #sray  (6897, 9, 24)
     weighted_y = weights * test_bm_preds  # (2816, 9, 24)
     weighted_y = weighted_y.sum(1)  # (2816, 24)
     mae_loss = mean_absolute_error(inv_trans(test_y), inv_trans(weighted_y))
     mape_loss = mean_absolute_percentage_error(inv_trans(test_y), inv_trans(weighted_y))
     return mae_loss, mape_loss, act_sorted
-
